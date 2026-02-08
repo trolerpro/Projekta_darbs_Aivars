@@ -1,45 +1,30 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
+import { Platform, StyleSheet, TextInput } from 'react-native';
+
+
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { useState } from 'react';
 
 export default function HomeScreen() {
+  const [thismonthShow, setThismonthShow] = useState('');
+
+  const lastMonthShow = '99999';
+  const now = thismonthShow ? parseInt(lastMonthShow) - parseInt(thismonthShow)  : '';
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
+    <ParallaxScrollView headerBackgroundColor={{ light: '#A1CEDC', dark: '#0000f9ff' }} headerImage={<></>}>
+      
+      
+          
+       
+    
       <ThemedView style={styles.stepContainer}>
         <Link href="/modal">
           <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+            <ThemedText type="subtitle" adjustsFontSizeToFit>Rādijumi</ThemedText>
           </Link.Trigger>
           <Link.Preview />
           <Link.Menu>
@@ -60,20 +45,26 @@ export default function HomeScreen() {
           </Link.Menu>
         </Link>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+        <ThemedText >
+          
+          pagājušā mēneša rādijums: {lastMonthShow}
         </ThemedText>
+        <ThemedView style={styles.inputRow}>
+          <ThemedText >Šī mēneša rādijums:</ThemedText>
+          <TextInput
+            style={styles.input}
+            value={thismonthShow}
+            onChangeText={(text) => setThismonthShow(text.replace(/[^0-9]/g, ''))}
+            placeholder="Ievadi rādijumu"
+            keyboardType="numeric"
+            maxLength={5}
+          />
+          <ThemedText > Līdz 31.01.2026</ThemedText>
+         
+        </ThemedView>
+        <ThemedText >Patēriņš : {now} </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+      
     </ParallaxScrollView>
   );
 }
@@ -88,11 +79,20 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    width: 90, 
+    marginLeft: 10,
   },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  
+  },
+  Background: {
+        backgroundColor: '#1e37f6ff',
+    },
 });

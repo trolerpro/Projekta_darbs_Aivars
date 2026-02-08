@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
   interpolate,
@@ -13,10 +13,11 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 
 const HEADER_HEIGHT = 250;
 
-type Props = PropsWithChildren<{
-  headerImage: ReactElement;
+type Props = {
+  children: ReactNode;
+  headerImage?: ReactElement;
   headerBackgroundColor: { dark: string; light: string };
-}>;
+};
 
 export default function ParallaxScrollView({
   children,
