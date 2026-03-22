@@ -10,9 +10,9 @@ import { useState } from 'react';
 
 export default function HomeScreen() {
   const [thismonthShow, setThismonthShow] = useState('');
+  const [lastMonthShow, setLastMonthShow] = useState('1');
 
-  const lastMonthShow = '99999';
-  const now = thismonthShow ? parseInt(lastMonthShow) - parseInt(thismonthShow)  : '';
+  const now = thismonthShow ? parseInt(thismonthShow) - parseInt(lastMonthShow) : '';
 
   return (
     <ParallaxScrollView headerBackgroundColor={{ light: '#A1CEDC', dark: '#0000f9ff' }} headerImage={<></>}>
@@ -58,6 +58,11 @@ export default function HomeScreen() {
             placeholder="Ievadi rādijumu"
             keyboardType="numeric"
             maxLength={5}
+            onSubmitEditing={() => {
+              if (thismonthShow && parseInt(thismonthShow) >= parseInt(lastMonthShow)) {
+                setLastMonthShow(thismonthShow);
+              }
+            }}
           />
           <ThemedText > Līdz 31.01.2026</ThemedText>
          
@@ -86,6 +91,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: 90, 
     marginLeft: 10,
+    fontSize: 10,
   },
   inputRow: {
     flexDirection: 'row',
