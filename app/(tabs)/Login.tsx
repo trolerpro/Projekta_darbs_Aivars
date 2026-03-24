@@ -1,42 +1,78 @@
-import { StyleSheet, TextInput, Alert,  } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, TextInput } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { setSession } from '@/lib/auth';
+import { ensureUser } from '@/lib/database';
 
 export default function LoginScreen() {
-  const [lietotajavards, setLietotajvards] = useState('');
-  const [password, setPassword] = useState('');
+  const router = useRouter();
+  const database = useSQLiteContext();
+  const isPhone = Platform.OS !== 'web';
+  const [lietotajaVards, setLietotajaVards] = useState('');
+  const [parole, setParole] = useState('');
 
-  const handleLogin = () => {
-    if (lietotajavards && password) {
-      Alert.alert(`Sveicināts, ${lietotajavards}!`);
-    } else {
-      Alert.alert('Lietotājvārds vai parole ir nepareiza');
+  const handleLogin = async () => {
+    const username = lietotajaVards.trim();
+    const isGuestLogin =
+      (username === 'dz1' && parole === 'dz1') ||
+      (username === 'dz5' && parole === 'dz5');
+
+    if (!username || !parole) {
+      Alert.alert('Kaut kas trūkst', 'Ievadi lietotājvārdu un paroli.');
+      return;
     }
+
+    if (username === 'x' && parole === 'x') {
+      setSession({ role: 'admin', username });
+      router.replace('/(tabs)/admin');
+      return;
+    }
+
+    if (!isGuestLogin) {
+      Alert.alert('Neizdevās', 'Atļautie viesu konti ir tikai dz1/dz1 vai dz5/dz5.');
+      return;
+    }
+
+    const isAllowed = await ensureUser(database, username, parole);
+
+    if (!isAllowed) {
+      Alert.alert('Neizdevās', 'Nepareiza parole šim lietotājam.');
+      return;
+    }
+
+    setSession({ role: 'user', username });
+    router.replace('/(tabs)');
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>Log In</ThemedText>
+    <ThemedView style={[styles.container, isPhone && styles.containerPhone]}>
+      <ThemedText type="title" style={styles.title}>Pieslēgties</ThemedText>
       <TextInput
-        style={styles.input}
-        placeholder="Lietotājvārds "
-        value={lietotajavards}
-        onChangeText={setLietotajvards}
+        style={[styles.input, isPhone && styles.inputPhone]}
+        placeholder="Lietotājvārds"
+        value={lietotajaVards}
+        onChangeText={setLietotajaVards}
         autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, isPhone && styles.inputPhone]}
         placeholder="Parole"
-        value={password}
-        onChangeText={setPassword}
+        value={parole}
+        onChangeText={setParole}
         secureTextEntry
       />
-      
-        <button style={styles.button} onTouchEnd={handleLogin}>Pieslēgties</button>
-      
+
+      <Pressable
+        style={[styles.button, isPhone && styles.buttonPhone]}
+        onPress={() => {
+          void handleLogin();
+        }}>
+        <ThemedText style={[styles.buttonText, isPhone && styles.buttonTextPhone]}>Pieslēgties</ThemedText>
+      </Pressable>
     </ThemedView>
   );
 }
@@ -47,11 +83,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    
+  },
+  containerPhone: {
+    padding: 12,
   },
   title: {
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 12,
+  },
+  subtitle: {
+    marginBottom: 24,
+    textAlign: 'center',
   },
   input: {
     textAlign: 'center',
@@ -60,21 +102,36 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     borderRadius: 5,
-    fontSize: 10,
-    width:350,
-    height:40,
+    fontSize: 16,
+    width: 320,
+    height: 48,
   },
-
-
-    button: {
+  inputPhone: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    marginBottom: 12,
+    fontSize: 14,
+    width: '92%',
+    maxWidth: 280,
+    height: 42,
+  },
+  button: {
     backgroundColor: '#007AFF',
     borderRadius: 5,
     width: 300,
-    height: 40,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-  
-
   },
-
+  buttonPhone: {
+    width: '85%',
+    maxWidth: 250,
+    height: 40,
+  },
+  buttonText: {
+    color: '#ffffff',
+  },
+  buttonTextPhone: {
+    fontSize: 13,
+  },
 });
