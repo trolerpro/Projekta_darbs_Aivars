@@ -50,25 +50,6 @@ export async function initializeDatabase(database: SQLiteDatabase) {
       UPDATE meter_readings SET username = 'dz1' WHERE username IS NULL;
     `);
   }
-
-
-  await database.execAsync(`
-    UPDATE users
-    SET username = 'dz1'
-    WHERE username = 'd'
-      AND NOT EXISTS (SELECT 1 FROM users WHERE username = 'dz1');
-
-    UPDATE users
-    SET username = 'dz5'
-    WHERE username = 'r'
-      AND NOT EXISTS (SELECT 1 FROM users WHERE username = 'dz5');
-
-    UPDATE meter_readings SET username = 'dz1' WHERE username = 'd';
-    UPDATE meter_readings SET username = 'dz5' WHERE username = 'r';
-
-    UPDATE users SET password = 'dz1' WHERE username = 'dz1';
-    UPDATE users SET password = 'dz5' WHERE username = 'dz5';
-  `);
 }
 
 export async function getReadings(database: SQLiteDatabase, username?: string) {
@@ -104,14 +85,6 @@ export async function addUser(database: SQLiteDatabase, username: string, passwo
     'INSERT INTO users (username, password, paterins) VALUES (?, ?, ?)',
     [username, password, paterins]
   );
-}
-
-export async function verifyLogin(database: SQLiteDatabase, username: string, password: string) {
-  const result = await database.getFirstAsync<UserRecord>(
-    'SELECT id, username, password, paterins FROM users WHERE username = ? AND password = ?',
-    [username, password]
-  );
-  return result !== null;
 }
 
 export async function getUser(database: SQLiteDatabase, username: string) {
