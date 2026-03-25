@@ -41,7 +41,6 @@ export async function initializeDatabase(database: SQLiteDatabase) {
     );
   `);
 
-  // Migrate older table structure where username was missing.
   const readingColumns = await database.getAllAsync<{ name: string }>('PRAGMA table_info(meter_readings)');
   const hasUsernameColumn = readingColumns.some((column) => column.name === 'username');
 
@@ -52,7 +51,7 @@ export async function initializeDatabase(database: SQLiteDatabase) {
     `);
   }
 
-  // Migrate old guest usernames to the new ones.
+
   await database.execAsync(`
     UPDATE users
     SET username = 'dz1'
